@@ -1,0 +1,30 @@
+{
+  "temperatureDataUpStairs": 
+  [
+    {
+      "title": "Upstairs",
+      "currentTemp": 21,
+      "heatingOptions": {
+        "legend": true,
+        "title": "Temperature - Upstairs",
+        "hAxis": { "title": "Time" }, 
+        "vAxis": { "title": "Temperature" } 
+      },
+      "heatingColumns": [
+        {
+          "label": "Time",
+          "type": "string"
+        },
+        {
+          "label": "Temperature",
+          "type": "number"
+        }
+      ],
+      "temperature_rows": [["11:29", 21.1], ["11:28", 22.2], ["11:27", 20.3], ["11:26", 22.5], ["11:25", 23.1], 
+                  ["11:24", 21.2], ["11:23", 20.9], ["11:22", 20.3], ["11:21", 19.5], ["11:20", 20.5]
+      ],
+      "thermostatTempValue": 20.5,
+      "HeatingOn": true
+    }
+  ]
+}
