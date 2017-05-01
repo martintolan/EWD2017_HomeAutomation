@@ -12,7 +12,7 @@ const temperatureDataDownStairs = {
                 ["11:24", 17.2], ["11:23", 21.9], ["11:22", 24.3], ["11:21", 18.5], ["11:20", 22.5]
   ],
   thermostatTempValue: 18.3,
-  HeatingOn: false
+  heatingOn: false
 };
 
 const temperatureDataUpStairs = {
@@ -23,7 +23,7 @@ const temperatureDataUpStairs = {
 		 	 				["11:24", 21.2], ["11:23", 20.9], ["11:22", 20.3], ["11:21", 19.5], ["11:20", 20.5]
   ],
   thermostatTempValue: 20.5,
-  HeatingOn: true
+  heatingOn: true
 };
 
 export const loadHeatingDataDownstairs = () =>{heatingModelDS.find({}).

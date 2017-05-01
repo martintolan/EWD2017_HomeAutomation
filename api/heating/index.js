@@ -11,79 +11,133 @@ const router = express.Router();
 // get heating info for the area specified
 router.get('/:areaId', (req, res) => {
     const areaId = req.params.areaId;
-    console.log(`HeatingAPI: Http GET(:/${areaId}) called`);
+    console.log(`HeatingAPI: Http GET(:/${areaId}) called; Getting the heating information.`);
     if(1 == areaId){
-        const heatingInfo = DBApi.getDownStairsInfo();
-        console.log(`heatingInfo: ${heatingInfo}`);
-        res.status(200).send({heatingInfo});
+        HeatingDS.find((err, heatingInfo) => {
+        if(err) { return handleError(res, err); }
+        return res.status(200).send(heatingInfo);
+        });
     }
     else{
-        const heatingInfo = DBApi.getUpStairsInfo();
-        console.log(`heatingInfo: ${heatingInfo}`);
-        res.status(200).send({heatingInfo});
+        HeatingUS.find((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            return res.status(200).send(heatingInfo);
+        });
     }
 });
 
 // get state of the switch for the heating for the specified area, On or Off
 router.get('/:areaId/switch', (req, res) => {
-    const area = req.params.areaId;
-    console.log(`HeatingAPI: Http GET(:/${area}/switch) called`);
-    //res.status(200).send({ message: `HeatingAPI: Http GET(:/${area}/switch) called` });
-    if(1 == area){
-        const heatingSwitchState = DBApi.getDownStairsSwitchStatus();
-        res.status(200).send({ heatingSwitchState });
+    const areaId = req.params.areaId;
+    console.log(`HeatingAPI: Http GET(:/${areaId}/switch) called; Getting the Heating On/Off status for the area.`);
+    if(1 == areaId){
+        HeatingDS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            var heatingStatus = heatingInfo.toJSON();
+            var heatingOn = heatingStatus.heatingOn;
+            res.status(200).send({heatingOn});
+        });
     }
     else{
-        const heatingSwitchState = DBApi.getUpStairsSwitchStatus();
-        res.status(200).send({ heatingSwitchState });
+        HeatingUS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            var heatingStatus = heatingInfo.toJSON();
+            var heatingOn = heatingStatus.heatingOn;
+            res.status(200).send({heatingOn});
+        });
     }
 });
 
 // get temperature set point for the heating in the specified area
 router.get('/:areaId/setpoint', (req, res) => {
-    const area = req.params.areaId;
-    console.log(`HeatingAPI: Http GET(:/${area}/setpoint) called`);
-    //res.status(200).send({ message: `HeatingAPI: Http GET(:/${area}/setpoint) called` });
-    if(1 == area){
-        const heatingSetPoint = DBApi.getDownStairsSetPoint();
-        res.status(200).send({ heatingSetPoint });
+    const areaId = req.params.areaId;
+    console.log(`HeatingAPI: Http GET(:/${areaId}/setpoint) called; Getting the Heating SetPoint value for the area.`);
+    if(1 == areaId){
+        HeatingDS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            var heatingStatus = heatingInfo.toJSON();
+            var setPoint = heatingStatus.thermostatTempValue;
+            res.status(200).send({setPoint});
+        });
     }
     else{
-        const heatingSetPoint = DBApi.getUpStairsSetPoint();
-        res.status(200).send({ heatingSetPoint });
+        HeatingUS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            var heatingStatus = heatingInfo.toJSON();
+            var setPoint = heatingStatus.thermostatTempValue;
+            res.status(200).send({setPoint});
+        });
     }
 });
 
 // Turn on/off the heading for the specified area
 router.put('/:areaId/switch', (req, res) => {
-    const area = req.params.areaId;
-    const command = req.body;
-    console.log(`HeatingAPI: Http PUT(:/${area}/switch) called with command: ${command.switchCommand}`);
-    //res.status(200).send({ message: `HeatingAPI: Http PUT(:/${area}/switch) called with command: ${command.switchCommand}` });
-    if(1 == area){
-        DBApi.setDownStairsSwitchStatus(command.switchCommand);
+    const areaId = req.params.areaId;
+    const heatingCommand = req.body;
+    console.log(`HeatingAPI: Http PUT(:/${areaId}/switch) called with command: ${heatingCommand.heatingOn}; Switching the heating On/Off in that area.`);
+    if(1 == areaId){
+        HeatingDS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            if(!heatingInfo) { return res.sendStatus(404); }
+            heatingInfo.heatingOn = heatingCommand.heatingOn;
+            const updated = heatingInfo;
+            updated.save((err) => {
+            if (err) { return handleError(res, err); }
+            res.status(200).send({updated});
+            });
+        });
     }
     else{
-        DBApi.setUpStairsSwitchStatus(command.switchCommand);
+        HeatingUS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            if(!heatingInfo) { return res.sendStatus(404); }
+            heatingInfo.heatingOn = heatingCommand.heatingOn;
+            const updated = heatingInfo;
+            updated.save((err) => {
+            if (err) { return handleError(res, err); }
+            res.status(200).send({updated});
+            });
+        });
     }
-    res.status(200).send();
 });
+
 
 // Set the tempaerature set point for the specified area
 router.put('/:areaId/setpoint', (req, res) => {
-    const area = req.params.areaId;
-    const setpoint = req.body;
-    console.log(`HeatingAPI: Http PUT(:/${area}/setpoint) called with a requested temperature: ${setpoint.temperature}`);
-    //res.status(200).send({ message: `HeatingAPI: Http PUT(:/${area}/setpoint) called with a requested temperature: ${setpoint.temperature}` });
-    if(1 == area){
-        DBApi.setDownStairsSetPoint(setpoint.temperature);
+    const areaId = req.params.areaId;
+    const heatingCommand = req.body;
+    console.log(`HeatingAPI: Http PUT(:/${areaId}/setpoint) called with a requested temperature: ${heatingCommand.thermostatTempValue}; Setting the Thermostat SetPoint for that area.`);
+    if(1 == areaId){
+        HeatingDS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            if(!heatingInfo) { return res.sendStatus(404); }
+            heatingInfo.thermostatTempValue = heatingCommand.thermostatTempValue;
+            const updated = heatingInfo;
+            updated.save((err) => {
+            if (err) { return handleError(res, err); }
+            res.status(200).send({updated});
+            });
+        });
     }
     else{
-        DBApi.setUpStairsSetPoint(setpoint.temperature);
+        HeatingUS.findOne((err, heatingInfo) => {
+            if(err) { return handleError(res, err); }
+            if(!heatingInfo) { return res.sendStatus(404); }
+            heatingInfo.thermostatTempValue = heatingCommand.thermostatTempValue;
+            const updated = heatingInfo;
+            updated.save((err) => {
+            if (err) { return handleError(res, err); }
+            res.status(200).send({updated});
+            });
+        });
     }
-    res.status(200).send();
-    //res.status(200).send({ message: `HeatingAPI: Http PUT(:/${area}/setpoint) called with a requested temperature: ${setpoint.temperature}` });
 });
+
+
+function handleError(res, err) {
+  console.log(`HeatingAPI: Error in Http call, returning HttpResult(500)`);
+  return res.status(500).send(err);
+};
 
 
 export default router;

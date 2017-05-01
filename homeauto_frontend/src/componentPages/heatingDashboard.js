@@ -17,8 +17,7 @@ import Slider from 'react-rangeslider';
 import 'react-rangeslider/lib/index.css';
 //import APIHeatingStub from './../test/stubAPIHeating';
 import * as APIHeating from './../api/HeatingAPI';
-import defaultTemperatureDataDS from './../config/defaultData';
-import defaultTemperatureDataUS from './../config/defaultData';
+import defaultTemperatureData from './../config/defaultData';
 
 
 //------------------------------------------------------
@@ -268,7 +267,7 @@ class HomeAutoHeatingGrids extends React.Component{
     var graphColumns = this.props.heatingColumns;
     var graphRows = this.props.heatingRows;
     var thermostatSetting = this.props.thermostatCurrentValue;
-    var heatingOn = this.props.HeatingOnForThisArea;
+    var heatingOn = this.props.heatingOnForThisArea;
 
     return (
 			<div>
@@ -368,7 +367,7 @@ class HomeAutoTableContainer extends React.Component{
 		var graphColumns = this.state.heatingColumns;
 		var graphRowsDownStairs = this.props.dataDownStairs.temperature_rows;
 		var thermostatSettingDownStairs = this.props.dataDownStairs.thermostatTempValue;
-		var HeatingOnForDownStairs = this.props.dataDownStairs.HeatingOn;
+		var heatingOnForDownStairs = this.props.dataDownStairs.heatingOn;
     var titleForDownStairs = this.props.dataDownStairs.title;
     var idForDownStairs = this.props.dataDownStairs.areaId;
 
@@ -376,7 +375,7 @@ class HomeAutoTableContainer extends React.Component{
 		var graphOptionsUpStairs = this.state.upstairsHeatingOptions;
 		var graphRowsUpStairs = this.props.dataUpStairs.temperature_rows;
 		var thermostatSettingUpStairs = this.props.dataUpStairs.thermostatTempValue;
-		var HeatingOnForUpStairs = this.props.dataUpStairs.HeatingOn;
+		var heatingOnForUpStairs = this.props.dataUpStairs.heatingOn;
     var titleForUpStairs = this.props.dataUpStairs.title;
     var idForUpStairs = this.props.dataUpStairs.areaId;
 
@@ -396,7 +395,7 @@ class HomeAutoTableContainer extends React.Component{
 			        		heatingColumns={graphColumns} 
 			        		heatingRows={graphRowsDownStairs} 
 			        		thermostatCurrentValue={thermostatSettingDownStairs} 
-			        		HeatingOnForThisArea={HeatingOnForDownStairs} 
+			        		heatingOnForThisArea={heatingOnForDownStairs} 
                   titleForThisArea={titleForDownStairs} 
                   idForThisArea={idForDownStairs}
 			        		changeTempHandler={this.props.changeTempHandler}
@@ -421,7 +420,7 @@ class HomeAutoTableContainer extends React.Component{
 			        		heatingColumns={graphColumns} 
 			        		heatingRows={graphRowsUpStairs} 
 			        		thermostatCurrentValue={thermostatSettingUpStairs} 
-			        		HeatingOnForThisArea={HeatingOnForUpStairs}
+			        		heatingOnForThisArea={heatingOnForUpStairs}
                   titleForThisArea={titleForUpStairs} 
                   idForThisArea={idForUpStairs}
 			        		changeTempHandler={this.props.changeTempHandler}
@@ -460,8 +459,8 @@ class HeatingDashboard extends React.Component{
     console.log('heatingDashBoard.js->HeatingDashboard->componentWillMount()');
     var convertedDefaultData = JSON.stringify(defaultTemperatureData);
     var defaultTempData = JSON.parse(convertedDefaultData);
-    this.setState({downstairsHeatingInfo: defaultTempDataDS,
-                  upstairsHeatingInfo: defaultTempDataUS
+    this.setState({downstairsHeatingInfo: defaultTempData,
+                  upstairsHeatingInfo: defaultTempData
                 });
   }
 
@@ -469,10 +468,26 @@ class HeatingDashboard extends React.Component{
     console.log('heatingDashBoard.js->HeatingDashboard->componentDidMount() - Reading Heating Info from API');
     var p = APIHeating.getHeatingData(globalsVars.areaID_DownStairs);
     p.then( response => { 
-      this.setState({downstairsHeatingInfo: response.heatingInfo});
+      var heatingInfoDS = null;
+      var count = response.map(function(heatingObject) {
+        if(undefined !== heatingObject)
+        {
+          heatingInfoDS = heatingObject;
+        }
+        return(1);
+      });
+      this.setState({downstairsHeatingInfo: heatingInfoDS});
       var p2 = APIHeating.getHeatingData(globalsVars.areaID_UpStairs);
       p2.then( response => { 
-        this.setState({upstairsHeatingInfo: response.heatingInfo});
+        var heatingInfoUS = null;
+        var count = response.map(function(heatingObject) {
+          if(undefined !== heatingObject)
+          {
+            heatingInfoUS = heatingObject;
+          }
+          return(1);
+        });
+        this.setState({upstairsHeatingInfo: heatingInfoUS});
       });
     });
   }

@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
     if (newLight){
       Lighting.create(newLight, (err, light) => {
         if(err) { return handleError(res, err); }
-        return res.status(201).send({light});
+        return res.status(200).send({light});
       });
     }else{
       return handleError(res, err);
@@ -37,7 +37,7 @@ router.put('/', (req, res) => {
   Lighting.update({lightOn: !command.lightOn}, {lightOn: command.lightOn}, {multi: true}, 
     function(err, num) {
       if(err) { return handleError(res, err); }
-      return res.status(201).send({num});
+      return res.status(200).send({num});
     }
   );
 });
