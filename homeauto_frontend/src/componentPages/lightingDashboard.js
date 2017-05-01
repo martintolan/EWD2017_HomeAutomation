@@ -15,6 +15,67 @@ import Thumbnail from 'react-bootstrap/lib/Thumbnail';
 
 
 
+var LightsForm = React.createClass({
+  getInitialState : function() {
+    return {
+      newName: '', 
+      newLocation: 1,
+      newLightState: false
+    };
+  },
+
+  handleNewNameChange: function(e) {
+    console.log("NameChange event occurred...");
+    this.setState({newName: e.target.value});
+  },
+
+  handleNewLocationChange: function(e) {
+    console.log("LocationChange event occurred...");
+    this.setState({newLocation: e.target.value});
+  },
+
+  handleNewLightStateChange: function(e) {
+    console.log("LightStateChange event occurred...");
+    this.setState({newLightState: e.target.value});
+  },
+
+  handleNewLight: function(e) {
+    console.log("NewLight button pressed...");
+    e.preventDefault();
+    var name = this.state.newName.trim();
+    var location = this.state.newLocation;
+    var lightState = this.state.newLightState;
+    console.log(`NewLight: name: ${name}, location: ${location}, lightState: ${lightState}`);
+
+    if (!name || location <= 0) {
+      return;
+    }
+
+    this.props.addNewLightHandler(name, location, lightState);
+  },
+
+  render: function(){
+    return (
+      <tr>
+        <td key={'newId'}>
+        </td>
+        <td key={'newName'}>
+          <input type="text" className="form-control" onChange={this.handleNewNameChange} />
+        </td>
+        <td key={'newLocation'}>
+          <input type="number" className="form-control" onChange={this.handleNewLocationChange} />
+        </td>
+        <td key={'newLightState'}>
+          <input type="text" className="form-control" onChange={this.handleNewLightStateChange} />
+        </td>
+        <td>
+          <input type="button" className="btn btn-primary" value="Add" onClick={this.handleNewLight} />
+        </td>
+      </tr>
+    )
+  }
+});
+
 //----------------------------------------------------------------------------
 //
 // Main class responsible for the Lighting Controls View
@@ -179,6 +240,7 @@ class LightsList extends React.Component {
     return (
       <tbody >
         {lightsRows}
+        <LightsForm addNewLightHandler={this.props.addNewLightsHandler} />
       </tbody>
     ); // return()
   } // render()
@@ -312,6 +374,7 @@ class LightingTable extends React.Component {
             <LightsList lightsInfo={this.props.allLightsInfo} 
               turnLightOn={this.props.LightOnHandler}
               turnLightOff={this.props.LightOffHandler} 
+              addNewLightsHandler={this.props.addLightsHandler}
             />
           </table>
           <Button onClick={ ()=> this.setState({ downstairsMapPanelOpen: !this.state.downstairsMapPanelOpen })}>
@@ -347,7 +410,7 @@ class LightingDashboard extends React.Component {
     };
     this.turnAllLightsOnRequest = this.turnAllLightsOnRequest.bind(this);
     this.turnAllLightsOffRequest = this.turnAllLightsOffRequest.bind(this);
-    /*this.switchAllFloorLightsRequest = this.switchAllFloorLightsRequest.bind(this);*/
+    this.addNewLightRequest = this.addNewLightRequest.bind(this);
     this.turnLightOnRequest = this.turnLightOnRequest.bind(this);
     this.turnLightOffRequest = this.turnLightOffRequest.bind(this);
   }// constructor()
@@ -395,9 +458,9 @@ class LightingDashboard extends React.Component {
     }).catch( error => {console.log( `turnAllLightsOffRequest() failed for ${error}` )}) ;
   } // turnAllLightsOffRequest
 
-  /*switchAllFloorLightsRequest(areaId, command) {
-    console.log(`Calling the switchAllFloorLightsRequest() callback function for area: ${areaId} with lisgts command: ${command}`);
-  } // switchAllFloorLightsRequest*/
+  addNewLightRequest(name, location, lightState) {
+    console.log(`Calling the addNewLightRequest() callback function for the room: ${name}, area: ${location} and default light state: ${lightState}`);
+  } // switchAllFloorLightsRequest
 
   turnLightOnRequest(lightId) {
     console.log(`Calling the turnLightOnRequest() callback function`);
@@ -444,6 +507,7 @@ class LightingDashboard extends React.Component {
           AllLightsOffHandler={this.turnAllLightsOffRequest}
           LightOnHandler={this.turnLightOnRequest}
           LightOffHandler={this.turnLightOffRequest}
+          addLightsHandler={this.addNewLightRequest}
         />
 			</div>
     ); // return

@@ -3,7 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import HeatingDS from './heatingModelDS';
 import HeatingUS from './heatingModelUS';
-import config from './../../config';
+import config from './../../config/config';
 
 const router = express.Router();
 

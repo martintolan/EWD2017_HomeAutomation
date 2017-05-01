@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import assert from 'assert';
-import heatingModelDS from './api/heating/heatingModelDS';
-import heatingModelUS from './api/heating/heatingModelUS';
+import heatingModelDS from './../api/heating/heatingModelDS';
+import heatingModelUS from './../api/heating/heatingModelUS';
 import config from './config';
 
 const temperatureDataDownStairs = {

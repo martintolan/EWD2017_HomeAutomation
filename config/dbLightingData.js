@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import assert from 'assert';
-import lightingModel from './api/lighting/lightingModel';
+import lightingModel from './../api/lighting/lightingModel';
 import config from './config';
 
 const lightsStatus = [

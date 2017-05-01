@@ -2,7 +2,7 @@ import express from 'express';
 //import DBApi from './DBApi';
 import mongoose from 'mongoose';
 import Lighting from './lightingModel';
-import config from './../../config';
+import config from './../../config/config';
 
 const router = express.Router();
 
