@@ -12,61 +12,64 @@ import ButtonToolbar from 'react-bootstrap/lib/ButtonToolbar';
 import Label from 'react-bootstrap/lib/Label';
 import Button from 'react-bootstrap/lib/Button';
 import Thumbnail from 'react-bootstrap/lib/Thumbnail';
+import DropdownButton from 'react-bootstrap/lib/DropdownButton';
+import MenuItem from 'react-bootstrap/lib/MenuItem';
+import Modal from 'react-bootstrap/lib/Modal';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 
 
-
-var LightsForm = React.createClass({
-  getInitialState : function() {
-    return {
+class LightsForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       newName: '', 
-      newLocation: 1,
-      newLightState: false
+      newLocation: 1
     };
-  },
+    this.handleNewNameChange = this.handleNewNameChange.bind(this);
+    this.handleNewLocationChange = this.handleNewLocationChange.bind(this);
+    this.handleNewLight = this.handleNewLight.bind(this);
+  }// constructor()
 
-  handleNewNameChange: function(e) {
+  handleNewNameChange(e) {
     console.log("NameChange event occurred...");
     this.setState({newName: e.target.value});
-  },
+  }
 
-  handleNewLocationChange: function(e) {
+  handleNewLocationChange(e) {
     console.log("LocationChange event occurred...");
     this.setState({newLocation: e.target.value});
-  },
+  }
 
-  handleNewLightStateChange: function(e) {
-    console.log("LightStateChange event occurred...");
-    this.setState({newLightState: e.target.value});
-  },
-
-  handleNewLight: function(e) {
+  handleNewLight(e) {
     console.log("NewLight button pressed...");
     e.preventDefault();
     var name = this.state.newName.trim();
     var location = this.state.newLocation;
-    var lightState = this.state.newLightState;
-    console.log(`NewLight: name: ${name}, location: ${location}, lightState: ${lightState}`);
+    console.log(`NewLight: name: ${name}, location: ${location}`);
 
     if (!name || location <= 0) {
       return;
     }
 
-    this.props.addNewLightHandler(name, location, lightState);
-  },
+    this.props.addNewLightHandler(name, location);
+    this.setState({newName: ''});
+    this.setState({newLocation: 1});
+    document.getElementById('enterTitle').value='';
+    document.getElementById('enterArea').value='';
+  }
 
-  render: function(){
+  render(){
     return (
       <tr>
         <td key={'newId'}>
         </td>
         <td key={'newName'}>
-          <input type="text" className="form-control" onChange={this.handleNewNameChange} />
+          <input type="text" id="enterTitle" className="form-control"placeholder="Room Name" onChange={this.handleNewNameChange} />
         </td>
         <td key={'newLocation'}>
-          <input type="number" className="form-control" onChange={this.handleNewLocationChange} />
+          <input type="number" id="enterArea" className="form-control" placeholder="Area Identifier" onChange={this.handleNewLocationChange} />
         </td>
         <td key={'newLightState'}>
-          <input type="text" className="form-control" onChange={this.handleNewLightStateChange} />
         </td>
         <td>
           <input type="button" className="btn btn-primary" value="Add" onClick={this.handleNewLight} />
@@ -74,7 +77,8 @@ var LightsForm = React.createClass({
       </tr>
     )
   }
-});
+};
+
 
 //----------------------------------------------------------------------------
 //
@@ -89,10 +93,15 @@ class Light extends React.Component {
       _id: this.props.lightDetail._id,
       title: this.props.lightDetail.title,
       areaId: this.props.lightDetail.areaId,
-      lightOn: this.props.lightDetail.lightOn
+      lightOn: this.props.lightDetail.lightOn,
+      showModal: false
     };
     this.handleTurnLightOn = this.handleTurnLightOn.bind(this);
     this.handleTurnLightOff = this.handleTurnLightOff.bind(this);
+    this.handleDeleteMenuItemClicked = this.handleDeleteMenuItemClicked.bind(this);
+    this.openOverlay = this.openOverlay.bind(this);
+    this.closeOverlay = this.closeOverlay.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
   }// constructor()
 
   shouldComponentUpdate(){
@@ -132,6 +141,25 @@ class Light extends React.Component {
     }
   } // handleTurnLightOff
 
+  handleDeleteMenuItemClicked(e) {
+    console.log(`Delete Menu Item Clicked`);
+    this.openOverlay();
+  } // handleDeleteMenuItemClicked
+
+  closeOverlay() {
+    this.setState({ showModal: false });
+  }
+
+  openOverlay() {
+    this.setState({ showModal: true });
+  }
+
+  confirmDelete(){
+    console.log(`Confirmed; the light will be deleted...`);
+    this.closeOverlay();
+    this.props.deleteLight(this.state._id);
+  }
+
   render() {
     console.log('lightingDashboard.js->Light->render()');
     var lightState = 'unknown';
@@ -169,12 +197,29 @@ class Light extends React.Component {
       </td>,
       <td key={'bottonStateOff'}>
         <input type="button" className='btn btn-info' value='Turn Light Off' onClick={this.handleTurnLightOff} />
+      </td>,
+      <td key={'adminInput'}>
+        <DropdownButton bsStyle='warning' title='Admin' key={1} id={`dropdown-basic-1`}>
+          <MenuItem eventKey="1" onClick={this.handleDeleteMenuItemClicked}>Delete Light</MenuItem>
+        </DropdownButton>
       </td>
     ];
 
     return (
       <tr >
         {fields}
+        <Modal show={this.state.showModal} onHide={this.close}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h4>Are you sure you want to delete the light?</h4>            
+          </Modal.Body>
+          <Modal.Footer>
+            <Button bsStyle="success" onClick={this.closeOverlay}>Cancel</Button>
+            <Button bsStyle="danger" onClick={this.confirmDelete}>Confirm</Button>
+          </Modal.Footer>
+        </Modal>
       </tr>
     ); // return
   } // render()
@@ -219,12 +264,12 @@ class LightsList extends React.Component {
       //const objectId = light._id;
       if(light._id !== undefined)
       {
-        //console.log(`light._id: ${light._id}; light.lightOn ${light.lightOn}`);
         var uniqueKey = light._id.toString();
         return(
           <Light key={uniqueKey} lightDetail={light} 
             turnLightOn={this.props.turnLightOn}
             turnLightOff={this.props.turnLightOff}
+            deleteLight={this.props.deleteLight}
           />
         );
       }
@@ -266,10 +311,6 @@ class LightingTable extends React.Component {
     };
     this.handleTurnAllLightsOn = this.handleTurnAllLightsOn.bind(this);
     this.handleTurnAllLightsOff = this.handleTurnAllLightsOff.bind(this);
-    /*this.handleTurnAllDownstairsLightsOn = this.handleTurnAllDownstairsLightsOn.bind(this);
-    this.handleTurnAllDownstairsLightsOff = this.handleTurnAllDownstairsLightsOff.bind(this);
-    this.handleTurnAllUpstairsLightsOn = this.handleTurnAllUpstairsLightsOn.bind(this);
-    this.handleTurnAllUpstairsLightsOff = this.handleTurnAllUpstairsLightsOff.bind(this);*/
   }// constructor()
 
   componentWillMount() {
@@ -303,30 +344,6 @@ class LightingTable extends React.Component {
     this.props.AllLightsOffHandler();
   } // handleTurnAllLightsOff
 
-  /*handleTurnAllDownstairsLightsOn(e) {
-    console.log("TurnAllLightsDownstairsOn button pressed");
-    e.preventDefault();
-    this.props.ToggleFloorLightsHandler(globalsVars.areaID_DownStairs, globalsVars.switchLightOn);
-  } // handleTurnAllDownstairsLightsOn
-
-  handleTurnAllDownstairsLightsOff(e) {
-    console.log("TurnAllLightsDownstairsOff button pressed");
-    e.preventDefault();
-    this.props.ToggleFloorLightsHandler(globalsVars.areaID_DownStairs, globalsVars.switchLightOff);
-  } // handleTurnAllDownstairsLightsOff
-
-  handleTurnAllUpstairsLightsOn(e) {
-    console.log("TurnAllLightsUpstairsOn button pressed");
-    e.preventDefault();
-    this.props.ToggleFloorLightsHandler(globalsVars.areaID_UpStairs, globalsVars.switchLightOn);
-  } // handleTurnAllUpstairsLightsOn
-
-  handleTurnAllUpstairsLightsOff(e) {
-    console.log("TurnAllLightsUpstairsOff button pressed");
-    e.preventDefault();
-    this.props.ToggleFloorLightsHandler(globalsVars.areaID_UpStairs, globalsVars.switchLightOff);
-  } // handleTurnAllUpstairsLightsOff*/
-
   render() {
     console.log('lightingDashboard.js->LightingTable->render()');
     const titleAll = (
@@ -335,30 +352,16 @@ class LightingTable extends React.Component {
     const titleIndividual = (
       <h3>Individual Lighting Controls</h3>
     );
-    /*const titleFloors = (
-      <h3>Floor Level Lighting Controls</h3>
-    );*/
 
     return (
       <div>
         <Panel header={titleAll} bsStyle="primary">
-          <h3><Label bsStyle="warning">Lights being Monitored: {this.props.numberOfLights}; Number of Lights On: {this.props.numberOfLightsOn}</Label>&nbsp;</h3>
+          <h3><Label bsStyle="warning">Lights being Monitored: {this.props.numberOfLights}, Number of Lights On: {this.props.numberOfLightsOn}</Label>&nbsp;</h3>
           <ButtonToolbar>
             <input type="button" className='btn btn-success' value='Turn All Lights On' onClick={this.handleTurnAllLightsOn} />
             <input type="button" className='btn btn-danger' value='Turn All Lights Off' onClick={this.handleTurnAllLightsOff} />
           </ButtonToolbar>
         </Panel>
-        {/*<Panel header={titleFloors} bsStyle="primary">
-          <ButtonToolbar>
-            <input type="button" className='btn btn-success' value='Turn All DownStairs Lights On' onClick={this.handleTurnAllDownstairsLightsOn} />
-            <input type="button" className='btn btn-danger' value='Turn All DownStairs Lights Off' onClick={this.handleTurnAllDownstairsLightsOff} />
-          </ButtonToolbar>
-          <p />
-          <ButtonToolbar>
-            <input type="button" className='btn btn-success' value='Turn All UpStairs Lights On' onClick={this.handleTurnAllUpstairsLightsOn} />
-            <input type="button" className='btn btn-danger' value='Turn All UpStairs Lights Off' onClick={this.handleTurnAllUpstairsLightsOff} />
-          </ButtonToolbar>
-        </Panel>*/}
         <Panel header={titleIndividual} bsStyle="primary">
           <table className="table table-bordered" >
             <thead>
@@ -369,11 +372,13 @@ class LightingTable extends React.Component {
                 <th>Light State</th>
                 <th></th>
                 <th></th>
+                <th></th>
               </tr>
             </thead>
             <LightsList lightsInfo={this.props.allLightsInfo} 
               turnLightOn={this.props.LightOnHandler}
               turnLightOff={this.props.LightOffHandler} 
+              deleteLight={this.props.deleteLight}
               addNewLightsHandler={this.props.addLightsHandler}
             />
           </table>
@@ -411,6 +416,7 @@ class LightingDashboard extends React.Component {
     this.turnAllLightsOnRequest = this.turnAllLightsOnRequest.bind(this);
     this.turnAllLightsOffRequest = this.turnAllLightsOffRequest.bind(this);
     this.addNewLightRequest = this.addNewLightRequest.bind(this);
+    this.deleteLightRequest = this.deleteLightRequest.bind(this);
     this.turnLightOnRequest = this.turnLightOnRequest.bind(this);
     this.turnLightOffRequest = this.turnLightOffRequest.bind(this);
   }// constructor()
@@ -458,9 +464,25 @@ class LightingDashboard extends React.Component {
     }).catch( error => {console.log( `turnAllLightsOffRequest() failed for ${error}` )}) ;
   } // turnAllLightsOffRequest
 
-  addNewLightRequest(name, location, lightState) {
-    console.log(`Calling the addNewLightRequest() callback function for the room: ${name}, area: ${location} and default light state: ${lightState}`);
-  } // switchAllFloorLightsRequest
+  addNewLightRequest(name, location) {
+    console.log(`Calling the addNewLightRequest() callback function for the room: ${name}, area: ${location}`);
+    APILighting.addNewLight(name, location).then ( response => {
+      var p = APILighting.getAllLightingData();
+      p.then( response => { 
+        this.setState({lightingInfo: response});
+      });
+    }).catch( error => {console.log( `addNewLightRequest() failed for ${error}` )}) ;
+  } // addNewLightRequest
+
+  deleteLightRequest(lightId) {
+    console.log(`Calling the deleteLightRequest() callback function for the lightId: ${lightId}`);
+    APILighting.deleteLight(lightId).then ( response => {
+      var p = APILighting.getAllLightingData();
+      p.then( response => { 
+        this.setState({lightingInfo: response});
+      });
+    }).catch( error => {console.log( `deleteLightRequest() failed for ${error}` )}) ;
+  } // deleteLightRequest
 
   turnLightOnRequest(lightId) {
     console.log(`Calling the turnLightOnRequest() callback function`);
@@ -494,12 +516,11 @@ class LightingDashboard extends React.Component {
         }
         return(numLightsOn);
     });
-    //console.log(`numLightsOn: ${numLightsOn}; count: ${count}`);    
 
     return (
 			<div>
 				<HomeAutoPageHeader HeaderText='Lighting Control ' SmallText='Use this page to monitor and control the lighting elements in your home. '/>
-        <LightingTable
+        <LightingTable id="lighting-table" 
           allLightsInfo={this.state.lightingInfo}
           numberOfLights={numberOfLightsBeingMonitored}
           numberOfLightsOn={numLightsOn}
@@ -507,6 +528,7 @@ class LightingDashboard extends React.Component {
           AllLightsOffHandler={this.turnAllLightsOffRequest}
           LightOnHandler={this.turnLightOnRequest}
           LightOffHandler={this.turnLightOffRequest}
+          deleteLight={this.deleteLightRequest}
           addLightsHandler={this.addNewLightRequest}
         />
 			</div>

@@ -74,7 +74,7 @@ router.put('/:lightId', (req, res) => {
 });
 
 // Delete the specified light
-router.delete('/:id', (req, res) => {
+router.delete('/:lightId', (req, res) => {
   const lightId = req.params.lightId;
   console.log(`LightingAPI: Http DELETE(/:${lightId}) called; Deleting the light.`);
   Lighting.findById(lightId, (err, light)=> {

@@ -21,6 +21,13 @@ export const setAllLightsState = (command) => {
               .then(resp => resp.data);
 };// setAllLightsState()
 
+// delete the specified light
+export const deleteLight = (lightId) => {
+  console.log(`apiLighting->deleteLight() function called for light with ID: ${lightId}`);
+  return axios.delete(`/api/lighting/${lightId}`)
+              .then(resp => resp.data);
+};// deleteLight()
+
 // get the data for the specified light
 export const getLightData = (lightId) => {
   console.log(`apiLighting->getLightData() function called for light with ID: ${lightId}`);
