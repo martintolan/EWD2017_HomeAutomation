@@ -1,6 +1,8 @@
 # EWD2017_HomeAutomation
 # Assignment 2 - Node backend with Mongo DB interacting with the ReactJS app frontend.
 
+Name: Martin Tolan
+
 ## Overview.
 The basic idea of the app is a Home Automation system that has a fully-fledged Node backend that serves all of the Rest APIs required by the frontend app. The Node backend also interacts with a MongoDB for all of its data persistence requirements. The MongoDB is queried for all REST transactions where data is used. The Web API supports all of the frontend APIs using the following technologies:
 - Node 
@@ -101,8 +103,8 @@ This can be seen in the image:
 ![][image7_lightingcrud] 
 
 
-[image1]: ./github_assets/image1_dbcollections.jpg
-[image2]: ./github_assets/image2_heating_downstairs.jpg
+[image1_dbcollections]: ./github_assets/image1_dbcollections.jpg
+[image2_heating_downstairs]: ./github_assets/image2_heating_downstairs.jpg
 [image3_heating_upstairs]: ./github_assets/image3_heating_upstairs.jpg
 [image4_lightings]: ./github_assets/image4_lightings.jpg
 [image5_webroutes]: ./github_assets/image5_webroutes.jpg
