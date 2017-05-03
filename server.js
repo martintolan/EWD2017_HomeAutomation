@@ -23,7 +23,8 @@ server.use(bodyParser.urlencoded({extended: true}));
 server.use('/api/heating', heatingRouter);
 server.use('/api/lighting', lightingRouter);
 server.use('/api/water', waterRouter);
-server.use(express.static('homeauto_frontend\\public'));
+server.use(express.static('homeauto_frontend/build'));
+//server.use(express.static('build'));
 
 
 // Connect to the database

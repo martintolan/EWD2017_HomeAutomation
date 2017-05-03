@@ -4,6 +4,7 @@
   "description": "Assignment 2 for the EWD 2017. This is the Home Automation BackEnd server.",
   "main": "index.js",
   "scripts": {
+    "startserver": "babel-node server.js",
     "start": "cross-env NODE_ENV=development nodemon --ignore homeauto_frontend/* --exec babel-node server.js",
     "test": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register --reporter mochawesome"
   },
