@@ -48,7 +48,7 @@ router.get('/:lightId', (req, res) => {
   const lightId = req.params.lightId;
   console.log(`LightingAPI: Http GET(/:${lightId}) called; Getting Light Information.`);
   Lighting.findById(lightId, (err, light) => {
-    if (err) { return handleError(res, err); }
+    if (err) { return res.sendStatus(404); }
     if(!light) { return res.sendStatus(404); }
     res.status(200).send({light});
   });
