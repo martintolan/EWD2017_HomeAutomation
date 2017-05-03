@@ -106,5 +106,5 @@ This can be seen in the image:
 [image3_heating_upstairs]: ./github_assets/image3_heating_upstairs.jpg
 [image4_lightings]: ./github_assets/image4_lightings.jpg
 [image5_webroutes]: ./github_assets/image5_webroutes.jpg
-[image6_nodebackendlayout]: ./github_assets/image6_nodebackendlayout.
+[image6_nodebackendlayout]: ./github_assets/image6_nodebackendlayout.jpg
 [image7_lightingcrud]: ./github_assets/image7_lightingcrud.jpg
